@@ -191,7 +191,10 @@ function social_activity_theme($existing, $type, $theme, $path) {
     'message_node_teaser' => [
       'variables' => [
         'link' => '',
-        'type' => '',
+        'name' => '',
+        'date' => '',
+        'content_type' => '',
+        'content_title' => '',
       ],
     ],
   ];

@@ -52,14 +52,12 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
               ->load($target_id);
 
             if ($entity) {
+              $date_formatter = \Drupal::service('date.formatter');
+              $date_format = 'social_long_date';
+              $date = $date_formatter->format($entity->getCreatedTime(), $date_format);
+              $name = $entity->getOwner()->getDisplayName();
               if ($target_type === 'post') {
                 /** @var \Drupal\social_post\Entity\PostInterface $entity */
-                $name = $entity->getOwner()->getDisplayName();
-
-                $date_formatter = \Drupal::service('date.formatter');
-                $date_format = 'social_long_date';
-                $date = $date_formatter->format($entity->getCreatedTime(), $date_format);
-
                 if ($entity->hasField('field_post') && !$entity->field_post->isEmpty()) {
                   $summary = _social_comment_get_summary($entity->field_post->value);
                 }
@@ -83,7 +81,7 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
                 $group_content_type = $entity->getGroupContentType();
 
                 if ($group_content_type !== NULL) {
-                  $display_name = mb_strtolower($group_content_type->label());
+                  $content_type_display_name = $group_content_type->label();
                 }
 
                 /** @var \Drupal\node\NodeInterface $node */
@@ -98,7 +96,10 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
                   $info = [
                     '#theme' => 'message_node_teaser',
                     '#link' => $link,
-                    '#type' => $display_name,
+                    '#name' => $name,
+                    '#date' => $date,
+                    '#content_type' => $content_type_display_name,
+                    '#content_title' => $node->getTitle(),
                   ];
 
                   $replacements[$original] = \Drupal::service('renderer')->renderPlain($info);

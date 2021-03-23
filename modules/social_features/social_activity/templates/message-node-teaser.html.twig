@@ -1,8 +1,16 @@
+<div class="comments">
+  <div class="post">
+    <div>{{ content_type }}</div>
+    <div>{{ content_title }}</div>
+    <small> {{ date }} .</small>{% trans %} by {% endtrans %} <em>{{ name }}</em>
+  </div>
+</div>
+
 <table class="btn-wrapp">
   <tr>
     <td class="align-center">
       <a href="{{ link }}" class="btn-link btn-link-bg btn-link-one">
-        {% trans %} Read more about this {% endtrans %} {{ type }}
+        {% trans %} Read more {% endtrans %}
       </a>
     </td>
   </tr>
