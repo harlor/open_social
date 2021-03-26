@@ -144,3 +144,49 @@ function social_group_tokens($type, $tokens, array $data, array $options, Bubble
 
   return $replacements;
 }
+
+/**
+ * Implements hook_tokens_alter().
+ */
+function social_group_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+  if ($context['type'] == 'message' && !empty($context['data']['message'])) {
+    /** @var Drupal\message\Entity\Message $message */
+    $message = $context['data']['message'];
+
+    // Alter the [message:cta-button] token, and replace it with the rendered
+    // content with new text and link.
+    if (isset($context['tokens']['cta-button'])) {
+      if (!empty(isset($message->field_message_related_object))) {
+        $target_type = $message->field_message_related_object->target_type;
+        $target_id = $message->field_message_related_object->target_id;
+
+        if (!empty($target_type) && $target_type === 'group_content') {
+          /** @var \Drupal\group\Entity\GroupContentInterface $group_content */
+          $group_content = \Drupal::entityTypeManager()
+            ->getStorage($target_type)
+            ->load($target_id);
+
+          if (!empty($group_content)) {
+            $type = $group_content->getContentPlugin()->getPluginId();
+            if ($type === 'group_membership') {
+              $message_template_id = $message->getTemplate()->id();
+              $cta_button = [];
+              switch ($message_template_id) {
+                case 'approve_request_join_group':
+                  $cta_button = [
+                    '#theme' => 'message_cta_button',
+                    '#link' => $group_content->getGroup()->toUrl()->toString(),
+                    '#text' => t('Explore the group'),
+                  ];
+                  break;
+              }
+              if (!empty($cta_button)) {
+                $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
