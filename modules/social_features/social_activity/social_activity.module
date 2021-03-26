@@ -180,21 +180,18 @@ function social_activity_social_user_account_header_items_alter(array &$menu_lin
  */
 function social_activity_theme($existing, $type, $theme, $path) {
   return [
-    'message_post_teaser' => [
+    'message_post_preview' => [
       'variables' => [
         'link' => '',
-        'name' => '',
+        'author_name' => '',
         'date' => '',
         'summary' => '',
       ],
     ],
-    'message_node_teaser' => [
+    'message_cta_button' => [
       'variables' => [
         'link' => '',
-        'name' => '',
-        'date' => '',
-        'content_type' => '',
-        'content_title' => '',
+        'entity_bundle_label' => '',
       ],
     ],
   ];
