@@ -191,7 +191,7 @@ function social_activity_theme($existing, $type, $theme, $path) {
     'message_cta_button' => [
       'variables' => [
         'link' => '',
-        'entity_bundle_label' => '',
+        'text' => '',
       ],
     ],
   ];

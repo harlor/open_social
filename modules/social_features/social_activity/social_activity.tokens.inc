@@ -91,10 +91,12 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
               ['absolute' => TRUE]
             )->toString();
 
-            $node_info = [
+            $cta_button = [
               '#theme' => 'message_cta_button',
               '#link' => $link,
-              '#entity_bundle_label' => $entity_bundle_label,
+              '#text' => t('Read more about this @entity_bundle_label', [
+                '@entity_bundle_label' => $entity_bundle_label,
+              ]),
             ];
 
           }
@@ -110,7 +112,7 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
 
             case 'cta_button':
               if (!empty($node_info)) {
-                $replacements[$original] = \Drupal::service('renderer')->renderPlain($node_info);
+                $replacements[$original] = \Drupal::service('renderer')->renderPlain($cta_button);
               }
               break;
           }
