@@ -47,6 +47,8 @@ function social_event_token_info() {
  */
 function social_event_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
   $replacements = [];
+  /** @var Drupal\message\Entity\Message $message */
+  $message = $data['message'];
   if ($type === 'social_event' && !empty($message)) {
     $event_enrollment_id = $message->getFieldValue('field_message_related_object', 'target_id');
     foreach ($tokens as $name => $original) {
@@ -90,6 +92,7 @@ function social_event_tokens($type, $tokens, array $data, array $options, Bubble
  */
 function social_event_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
   if ($context['type'] == 'message' && !empty($context['data']['message'])) {
+    /** @var Drupal\message\Entity\Message $message */
     $message = $context['data']['message'];
 
     // Alter the [message:cta-button] token, and replace it with the rendered
@@ -97,12 +100,28 @@ function social_event_tokens_alter(array &$replacements, array $context, Bubblea
     if (isset($context['tokens']['cta-button'])) {
       if (!empty($event_enrollment_id = $message->getFieldValue('field_message_related_object', 'target_id'))) {
         if ($link = _social_event_get_link_to_event_from_enrollment($event_enrollment_id, TRUE)) {
-          $cta_button = [
-            '#theme' => 'message_cta_button',
-            '#link' => $link . '/all-enrollments',
-            '#text' => t('View enrollments'),
-          ];
-          $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+          $message_template_id = $message->getTemplate()->id();
+          $cta_button = [];
+          switch ($message_template_id) {
+            case 'activity_on_events_im_organizing':
+              $cta_button = [
+                '#theme' => 'message_cta_button',
+                '#link' => $link . '/all-enrollments',
+                '#text' => t('View enrollments'),
+              ];
+              break;
+
+            case 'member_added_by_event_organiser':
+              $cta_button = [
+                '#theme' => 'message_cta_button',
+                '#link' => $link,
+                '#text' => t('See the event'),
+              ];
+              break;
+          }
+          if (!empty($cta_button)) {
+            $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+          }
         }
       }
     }
