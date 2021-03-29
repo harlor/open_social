@@ -250,6 +250,67 @@ function social_comment_tokens($type, $tokens, array $data, array $options, Bubb
 }
 
 /**
+ * Implements hook_tokens_alter().
+ */
+function social_comment_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+  if ($context['type'] == 'message' && !empty($context['data']['message'])) {
+    /** @var Drupal\message\Entity\Message $message */
+    $message = $context['data']['message'];
+
+    // Alter the [message:cta-button] token, and replace it with the rendered
+    // content with new text and link.
+    if (isset($context['tokens']['cta-button'])) {
+      if (!empty(isset($message->field_message_related_object))) {
+        $target_type = $message->field_message_related_object->target_type;
+        $target_id = $message->field_message_related_object->target_id;
+
+        $comment = \Drupal::entityTypeManager()->getStorage($target_type)
+          ->load($target_id);
+
+        if ($comment instanceof CommentInterface && $comment->getEntityTypeId() === 'commment') {
+          /** @var \Drupal\Core\Entity\Entity $entity */
+          $entity = $comment->getCommentedEntity();
+          if (!empty($entity)) {
+            $commented_entity = $comment->getCommentedEntity();
+            $commented_entity_type = $commented_entity->getEntityTypeId();
+            // A reply link for a post should go to the post view.
+            $link = NULL;
+            if ($commented_entity_type === 'post') {
+              $link = $entity->toUrl('canonical', ['absolute' => TRUE])->toString();
+            }
+            else {
+              // For comments however it should go to comment reply page.
+              $link = Url::fromRoute('comment.reply', [
+                'entity_type' => $comment->getCommentedEntityTypeId(),
+                'entity' => $comment->getCommentedEntityId(),
+                'field_name' => $comment->getFieldName(),
+                'pid' => $comment->id(),
+              ])->toString();
+            }
+            if ($link) {
+              $message_template_id = $message->getTemplate()->id();
+              $cta_button = [];
+              switch ($message_template_id) {
+                case 'create_comment_author_node_post':
+                  $cta_button = [
+                    '#theme' => 'message_cta_button',
+                    '#link' => $link,
+                    '#text' => t('Reply to this comment'),
+                  ];
+                  break;
+              }
+              if (!empty($cta_button)) {
+                $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
  * Get first 280 characters of text.
  *
  * @param string $text
