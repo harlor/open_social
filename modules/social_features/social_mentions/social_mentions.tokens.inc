@@ -161,3 +161,56 @@ function social_mentions_tokens($type, $tokens, array $data, array $options, Bub
 
   return $replacements;
 }
+
+/**
+ * Implements hook_tokens_alter().
+ */
+function social_mentions_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+  if ($context['type'] == 'message' && !empty($context['data']['message'])) {
+    /** @var Drupal\message\Entity\Message $message */
+    $message = $context['data']['message'];
+
+    // Alter the [message:cta-button] token, and replace it with the rendered
+    // content with new text and link.
+    if (isset($context['tokens']['cta-button'])) {
+      if (!empty(isset($message->field_message_related_object))) {
+        $target_type = $message->field_message_related_object->target_type;
+        $target_id = $message->field_message_related_object->target_id;
+
+        /** @var \Drupal\mentions\Entity\Mentions $mention */
+        $mention = \Drupal::entityTypeManager()
+          ->getStorage($target_type)
+          ->load($target_id);
+
+        if ($mention instanceof Mentions && $mentioned_entity = $mention->getMentionedEntity()) {
+          if ($mentioned_entity->getEntityTypeId() === 'comment') {
+            $entity = $mentioned_entity->getCommentedEntity();
+          }
+          else {
+            $entity = $mentioned_entity;
+          }
+        }
+      }
+      if (isset($entity)) {
+        $url_options = ['absolute' => TRUE];
+        $link = $entity->toUrl('canonical', $url_options)->toString();
+        if ($link) {
+          $message_template_id = $message->getTemplate()->id();
+          $cta_button = [];
+          switch ($message_template_id) {
+            case 'create_mention_comment':
+              $cta_button = [
+                '#theme' => 'message_cta_button',
+                '#link' => $link,
+                '#text' => t('See the comment'),
+              ];
+              break;
+          }
+          if (!empty($cta_button)) {
+            $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+          }
+        }
+      }
+    }
+  }
+}
