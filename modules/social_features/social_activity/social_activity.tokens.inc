@@ -48,33 +48,36 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
       $entity = \Drupal::entityTypeManager()->getStorage($target_type)
         ->load($target_id);
       if ($entity) {
-        if ($target_type === 'post') {
-          $summary = '';
+        $date_formatter = \Drupal::service('date.formatter');
+        $date_format = 'social_long_date';
+        $summary = '';
 
+        if ($target_type === 'post') {
           /** @var \Drupal\social_post\Entity\PostInterface $entity */
           $author_name = $entity->getOwner()->getDisplayName();
-
-          $date_formatter = \Drupal::service('date.formatter');
-          $date_format = 'social_long_date';
           $date = $date_formatter->format($entity->getCreatedTime(), $date_format);
 
+          // Get the summary of the comment.
           if ($entity->hasField('field_post') && !$entity->field_post->isEmpty()) {
             $summary = _social_comment_get_summary($entity->field_post->value);
           }
 
+          // Prepare the link to post.
           $link = Url::fromRoute('entity.post.canonical',
             ['post' => $entity->id()],
             ['absolute' => TRUE]
           )->toString();
 
+          // Prepare the preview information.
           $preview_info = [
-            '#theme' => 'message_post_preview',
+            '#theme' => 'message_entity_preview',
             '#author_name' => $author_name,
             '#date' => $date,
             '#summary' => $summary,
             '#link' => $link,
           ];
 
+          // Prepare the CTA button markup.
           $cta_button = [
             '#theme' => 'message_cta_button',
             '#link' => $link,
@@ -97,6 +100,20 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
               ['absolute' => TRUE]
             )->toString();
 
+            $author_name = $node->getOwner()->getDisplayName();
+            $date = $date_formatter->format($node->getCreatedTime(), $date_format);
+            $summary = $node->getTitle();
+
+            // Prepare the preview.
+            $preview_info = [
+              '#theme' => 'message_entity_preview',
+              '#author_name' => $author_name,
+              '#date' => $date,
+              '#summary' => $summary,
+              '#link' => $link,
+            ];
+
+            // Prepare the CTA button markup.
             $cta_button = [
               '#theme' => 'message_cta_button',
               '#link' => $link,
@@ -107,6 +124,8 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
 
           }
         }
+
+        // Replace tokens.
         foreach ($tokens as $name => $original) {
           $replacements[$original] = '';
           switch ($name) {
