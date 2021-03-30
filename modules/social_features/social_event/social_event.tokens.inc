@@ -112,6 +112,7 @@ function social_event_tokens_alter(array &$replacements, array $context, Bubblea
               break;
 
             case 'member_added_by_event_organiser':
+            case 'event_request_approved':
               $cta_button = [
                 '#theme' => 'message_cta_button',
                 '#link' => $link,
