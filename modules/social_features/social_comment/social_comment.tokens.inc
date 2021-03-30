@@ -292,6 +292,8 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
               $cta_button = [];
               switch ($message_template_id) {
                 case 'create_comment_author_node_post':
+                case 'create_comment_post_profile':
+                case 'create_comment_following_node':
                   $cta_button = [
                     '#theme' => 'message_cta_button',
                     '#link' => $link,
