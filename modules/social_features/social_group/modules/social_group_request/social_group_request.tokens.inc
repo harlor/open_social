@@ -65,3 +65,48 @@ function social_group_request_tokens($type, $tokens, array $data, array $options
 
   return $replacements;
 }
+
+/**
+ * Implements hook_tokens_alter().
+ */
+function social_group_request_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+  if ($context['type'] == 'message' && !empty($context['data']['message'])) {
+    /** @var Drupal\message\Entity\Message $message */
+    $message = $context['data']['message'];
+
+    // Alter the [message:cta-button] token, and replace it with the rendered
+    // content with new text and link.
+    if (isset($context['tokens']['cta-button'])) {
+      if ($message->hasField('field_message_related_object') && !$message->get('field_message_related_object')->isEmpty()) {
+        $target_type = $message->field_message_related_object->target_type;
+        $target_id = $message->field_message_related_object->target_id;
+
+        if (isset($target_type) && !empty($target_type) && $target_type === 'group_content') {
+          /** @var \Drupal\group\Entity\GroupContentInterface $group_content */
+          $group_content = \Drupal::entityTypeManager()
+            ->getStorage($target_type)
+            ->load($target_id);
+
+          if (!empty($group_content)) {
+            $link = Url::fromRoute('view.group_pending_members.membership_requests', ['arg_0' => $group_content->getGroup()->id()],
+              ['absolute' => TRUE])->toString();
+            $message_template_id = $message->getTemplate()->id();
+            $cta_button = [];
+            switch ($message_template_id) {
+              case 'request_to_join_a_group':
+                $cta_button = [
+                  '#theme' => 'message_cta_button',
+                  '#link' => $link,
+                  '#text' => t('View the requests'),
+                ];
+                break;
+            }
+            if (!empty($cta_button)) {
+              $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+            }
+          }
+        }
+      }
+    }
+  }
+}
