@@ -177,3 +177,47 @@ function social_follow_taxonomy_tokens($type, $tokens, array $data, array $optio
 
   return $replacements;
 }
+
+/**
+ * Implements hook_tokens_alter().
+ */
+function social_follow_taxonomy_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+  if ($context['type'] == 'message' && !empty($context['data']['message'])) {
+    /** @var Drupal\message\Entity\Message $message */
+    $message = $context['data']['message'];
+
+    // Alter the [message:cta-button] token, and replace it with the rendered
+    // content with new text and link.
+    if (isset($context['tokens']['cta-button'])) {
+      if ($message->hasField('field_message_related_object') && !$message->get('field_message_related_object')->isEmpty()) {
+        $target_type = $message->field_message_related_object->target_type;
+        $target_id = $message->field_message_related_object->target_id;
+
+        if (isset($target_type) && !empty($target_type) && $target_type === 'group_content') {
+          /** @var \Drupal\node\NodeInterface $group_content */
+          $node = \Drupal::entityTypeManager()
+            ->getStorage($target_type)
+            ->load($target_id);
+
+          if (!empty($node)) {
+            $url_string = $node->toUrl('canonical')->toString(TRUE)->getGeneratedUrl();
+            $message_template_id = $message->getTemplate()->id();
+            $cta_button = [];
+            switch ($message_template_id) {
+              case 'update_node_following_tag':
+                $cta_button = [
+                  '#theme' => 'message_cta_button',
+                  '#link' => $url_string,
+                  '#text' => t('Read more about it'),
+                ];
+                break;
+            }
+            if (!empty($cta_button)) {
+              $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+            }
+          }
+        }
+      }
+    }
+  }
+}
