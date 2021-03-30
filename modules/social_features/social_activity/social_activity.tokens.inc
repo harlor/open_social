@@ -62,17 +62,23 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
             $summary = _social_comment_get_summary($entity->field_post->value);
           }
 
-          $post_link = Url::fromRoute('entity.post.canonical',
+          $link = Url::fromRoute('entity.post.canonical',
             ['post' => $entity->id()],
             ['absolute' => TRUE]
           )->toString();
 
-          $post_info = [
+          $preview_info = [
             '#theme' => 'message_post_preview',
             '#author_name' => $author_name,
             '#date' => $date,
             '#summary' => $summary,
-            '#link' => $post_link,
+            '#link' => $link,
+          ];
+
+          $cta_button = [
+            '#theme' => 'message_cta_button',
+            '#link' => $link,
+            '#text' => t('See the post'),
           ];
         }
         elseif ($target_type === 'group_content' && $entity instanceof GroupContentInterface) {
@@ -105,13 +111,13 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
           $replacements[$original] = '';
           switch ($name) {
             case 'preview':
-              if (!empty($post_info)) {
-                $replacements[$original] = \Drupal::service('renderer')->renderPlain($post_info);
+              if (!empty($preview_info)) {
+                $replacements[$original] = \Drupal::service('renderer')->renderPlain($preview_info);
               }
               break;
 
             case 'cta_button':
-              if (!empty($node_info)) {
+              if (!empty($cta_button)) {
                 $replacements[$original] = \Drupal::service('renderer')->renderPlain($cta_button);
               }
               break;
