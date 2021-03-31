@@ -127,7 +127,6 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
 
         // Replace tokens.
         foreach ($tokens as $name => $original) {
-          $replacements[$original] = '';
           switch ($name) {
             case 'preview':
               if (!empty($preview_info)) {
