@@ -257,9 +257,9 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
     /** @var Drupal\message\Entity\Message $message */
     $message = $context['data']['message'];
 
-    // Alter the [message:cta-button] token, and replace it with the rendered
+    // Alter the [message:cta_button] token, and replace it with the rendered
     // content with new text and link.
-    if (isset($context['tokens']['cta-button'])) {
+    if (isset($context['tokens']['cta_button'])) {
       if (!empty(isset($message->field_message_related_object))) {
         $target_type = $message->field_message_related_object->target_type;
         $target_id = $message->field_message_related_object->target_id;
@@ -294,6 +294,7 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
                 case 'create_comment_author_node_post':
                 case 'create_comment_post_profile':
                 case 'create_comment_following_node':
+                case 'create_comment_reply':
                   $cta_button = [
                     '#theme' => 'message_cta_button',
                     '#link' => $link,
@@ -302,7 +303,7 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
                   break;
               }
               if (!empty($cta_button)) {
-                $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->renderPlain($cta_button);
+                $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);
               }
             }
           }

@@ -74,9 +74,9 @@ function social_group_request_tokens_alter(array &$replacements, array $context,
     /** @var Drupal\message\Entity\Message $message */
     $message = $context['data']['message'];
 
-    // Alter the [message:cta-button] token, and replace it with the rendered
+    // Alter the [message:cta_button] token, and replace it with the rendered
     // content with new text and link.
-    if (isset($context['tokens']['cta-button'])) {
+    if (isset($context['tokens']['cta_button'])) {
       if ($message->hasField('field_message_related_object') && !$message->get('field_message_related_object')->isEmpty()) {
         $target_type = $message->field_message_related_object->target_type;
         $target_id = $message->field_message_related_object->target_id;
@@ -102,7 +102,7 @@ function social_group_request_tokens_alter(array &$replacements, array $context,
                 break;
             }
             if (!empty($cta_button)) {
-              $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->renderPlain($cta_button);
+              $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);
             }
           }
         }

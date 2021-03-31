@@ -96,9 +96,9 @@ function social_event_tokens_alter(array &$replacements, array $context, Bubblea
     /** @var Drupal\message\Entity\Message $message */
     $message = $context['data']['message'];
 
-    // Alter the [message:cta-button] token, and replace it with the rendered
+    // Alter the [message:cta_button] token, and replace it with the rendered
     // content with new text and link.
-    if (isset($context['tokens']['cta-button'])) {
+    if (isset($context['tokens']['cta_button'])) {
       if (!empty($event_enrollment_id = $message->getFieldValue('field_message_related_object', 'target_id'))) {
         $link = _social_event_get_link_to_event_from_enrollment($event_enrollment_id, TRUE);
         $message_template_id = $message->getTemplate()->id();
@@ -138,7 +138,7 @@ function social_event_tokens_alter(array &$replacements, array $context, Bubblea
             break;
         }
         if (!empty($cta_button)) {
-          $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->renderPlain($cta_button);
+          $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);
         }
       }
     }
