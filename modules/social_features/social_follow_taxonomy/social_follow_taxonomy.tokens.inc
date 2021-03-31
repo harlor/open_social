@@ -213,7 +213,7 @@ function social_follow_taxonomy_tokens_alter(array &$replacements, array $contex
                 break;
             }
             if (!empty($cta_button)) {
-              $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+              $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->renderPlain($cta_button);
             }
           }
         }

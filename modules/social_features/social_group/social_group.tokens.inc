@@ -181,7 +181,7 @@ function social_group_tokens_alter(array &$replacements, array $context, Bubblea
                   break;
               }
               if (!empty($cta_button)) {
-                $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+                $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->renderPlain($cta_button);
               }
             }
           }

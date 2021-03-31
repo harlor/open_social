@@ -267,7 +267,7 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
         $comment = \Drupal::entityTypeManager()->getStorage($target_type)
           ->load($target_id);
 
-        if ($comment instanceof CommentInterface && $comment->getEntityTypeId() === 'commment') {
+        if ($comment instanceof CommentInterface) {
           /** @var \Drupal\Core\Entity\Entity $entity */
           $entity = $comment->getCommentedEntity();
           if (!empty($entity)) {
@@ -302,7 +302,7 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
                   break;
               }
               if (!empty($cta_button)) {
-                $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->render($cta_button);
+                $replacements[$context['tokens']['cta-button']] = \Drupal::service('renderer')->renderPlain($cta_button);
               }
             }
           }
