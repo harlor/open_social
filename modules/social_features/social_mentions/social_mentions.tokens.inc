@@ -85,8 +85,8 @@ function social_mentions_tokens($type, $tokens, array $data, array $options, Bub
 
           if ($name === 'mentioned_user') {
             if (isset($message->field_message_related_object)) {
-              $target_type = $message->field_message_related_object->target_type;
-              $target_id = $message->field_message_related_object->target_id;
+              $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+              $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
               $mention = \Drupal::entityTypeManager()
                 ->getStorage($target_type)
                 ->load($target_id);
@@ -105,8 +105,8 @@ function social_mentions_tokens($type, $tokens, array $data, array $options, Bub
         case 'commented_entity_link_html':
 
           if (isset($message->field_message_related_object)) {
-            $target_type = $message->field_message_related_object->target_type;
-            $target_id = $message->field_message_related_object->target_id;
+            $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+            $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
             /** @var \Drupal\mentions\Entity\Mentions $mention */
             $mention = \Drupal::entityTypeManager()
               ->getStorage($target_type)
@@ -174,8 +174,8 @@ function social_mentions_tokens_alter(array &$replacements, array $context, Bubb
     // content with new text and link.
     if (isset($context['tokens']['cta_button'])) {
       if (!empty(isset($message->field_message_related_object))) {
-        $target_type = $message->field_message_related_object->target_type;
-        $target_id = $message->field_message_related_object->target_id;
+        $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+        $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
         /** @var \Drupal\mentions\Entity\Mentions $mention */
         $mention = \Drupal::entityTypeManager()

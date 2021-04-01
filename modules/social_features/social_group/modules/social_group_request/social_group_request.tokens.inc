@@ -45,8 +45,8 @@ function social_group_request_tokens($type, $tokens, array $data, array $options
       if ($name === 'request_page_link') {
         // Get the related entity.
         if ($message->hasField('field_message_related_object') && !$message->get('field_message_related_object')->isEmpty()) {
-          $target_type = $message->field_message_related_object->target_type;
-          $target_id = $message->field_message_related_object->target_id;
+          $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+          $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
           if (isset($target_type) && !empty($target_type) && $target_type === 'group_content') {
             /** @var \Drupal\group\Entity\GroupContentInterface $group_content */
@@ -78,8 +78,8 @@ function social_group_request_tokens_alter(array &$replacements, array $context,
     // content with new text and link.
     if (isset($context['tokens']['cta_button'])) {
       if ($message->hasField('field_message_related_object') && !$message->get('field_message_related_object')->isEmpty()) {
-        $target_type = $message->field_message_related_object->target_type;
-        $target_id = $message->field_message_related_object->target_id;
+        $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+        $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
         if (isset($target_type) && !empty($target_type) && $target_type === 'group_content') {
           /** @var \Drupal\group\Entity\GroupContentInterface $group_content */

@@ -61,8 +61,8 @@ function social_group_tokens($type, $tokens, array $data, array $options, Bubble
 
           // Get the related entity.
           if (isset($message->field_message_related_object)) {
-            $target_type = $message->field_message_related_object->target_type;
-            $target_id = $message->field_message_related_object->target_id;
+            $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+            $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
             $entity = \Drupal::entityTypeManager()
               ->getStorage($target_type)
               ->load($target_id);
@@ -157,8 +157,8 @@ function social_group_tokens_alter(array &$replacements, array $context, Bubblea
     // content with new text and link.
     if (isset($context['tokens']['cta_button'])) {
       if (!empty(isset($message->field_message_related_object))) {
-        $target_type = $message->field_message_related_object->target_type;
-        $target_id = $message->field_message_related_object->target_id;
+        $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+        $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
         if (!empty($target_type) && $target_type === 'group_content') {
           /** @var \Drupal\group\Entity\GroupContentInterface $group_content */

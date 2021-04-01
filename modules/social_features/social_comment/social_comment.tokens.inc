@@ -104,8 +104,8 @@ function social_comment_tokens($type, $tokens, array $data, array $options, Bubb
         case 'comment_reply_link_html':
 
           if (isset($message->field_message_related_object)) {
-            $target_type = $message->field_message_related_object->target_type;
-            $target_id = $message->field_message_related_object->target_id;
+            $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+            $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
             $comment = \Drupal::entityTypeManager()->getStorage($target_type)
               ->load($target_id);
@@ -190,8 +190,8 @@ function social_comment_tokens($type, $tokens, array $data, array $options, Bubb
         case 'commented_entity_link_html':
 
           if (isset($message->field_message_related_object)) {
-            $target_type = $message->field_message_related_object->target_type;
-            $target_id = $message->field_message_related_object->target_id;
+            $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+            $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
             $comment = \Drupal::entityTypeManager()->getStorage($target_type)
               ->load($target_id);
@@ -261,8 +261,8 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
     // content with new text and link.
     if (isset($context['tokens']['cta_button'])) {
       if (!empty(isset($message->field_message_related_object))) {
-        $target_type = $message->field_message_related_object->target_type;
-        $target_id = $message->field_message_related_object->target_id;
+        $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+        $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
         $comment = \Drupal::entityTypeManager()->getStorage($target_type)
           ->load($target_id);

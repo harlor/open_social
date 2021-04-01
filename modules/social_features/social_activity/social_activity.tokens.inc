@@ -42,8 +42,8 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
     $message = $data['message'];
     if (isset($message->field_message_related_object)) {
 
-      $target_type = $message->field_message_related_object->target_type;
-      $target_id = $message->field_message_related_object->target_id;
+      $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+      $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
       $entity = \Drupal::entityTypeManager()->getStorage($target_type)
         ->load($target_id);

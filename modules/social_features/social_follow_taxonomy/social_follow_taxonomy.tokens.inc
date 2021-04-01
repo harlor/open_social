@@ -71,8 +71,8 @@ function social_follow_taxonomy_tokens($type, $tokens, array $data, array $optio
           $message = $data['message'];
           // Get the related entity.
           if (isset($message->field_message_related_object)) {
-            $target_type = $message->field_message_related_object->target_type;
-            $target_id = $message->field_message_related_object->target_id;
+            $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+            $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
             $entity = \Drupal::entityTypeManager()
               ->getStorage($target_type)
               ->load($target_id);
@@ -154,8 +154,8 @@ function social_follow_taxonomy_tokens($type, $tokens, array $data, array $optio
       if ($name === 'post_url' && isset($message->field_message_related_object)) {
         $replacements[$original] = '';
 
-        $target_type = $message->field_message_related_object->target_type;
-        $target_id = $message->field_message_related_object->target_id;
+        $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+        $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
         $entity = \Drupal::entityTypeManager()
           ->getStorage($target_type)
@@ -190,8 +190,8 @@ function social_follow_taxonomy_tokens_alter(array &$replacements, array $contex
     // content with new text and link.
     if (isset($context['tokens']['cta_button'])) {
       if ($message->hasField('field_message_related_object') && !$message->get('field_message_related_object')->isEmpty()) {
-        $target_type = $message->field_message_related_object->target_type;
-        $target_id = $message->field_message_related_object->target_id;
+        $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
+        $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
         if (isset($target_type) && !empty($target_type) && $target_type === 'group_content') {
           /** @var \Drupal\node\NodeInterface $group_content */

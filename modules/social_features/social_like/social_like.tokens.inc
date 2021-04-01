@@ -52,7 +52,7 @@ function social_like_tokens($type, $tokens, array $data, array $options, Bubblea
     /** @var \Drupal\message\Entity\Message $message */
     $message = $data['message'];
     /** @var \Drupal\votingapi\Entity\Vote $vote */
-    if ($vote = Vote::load($message->field_message_related_object->target_id)) {
+    if ($vote = Vote::load($message->getFieldValue('field_message_related_object', 'target_id'))) {
       foreach ($tokens as $name => $original) {
         switch ($name) {
 
@@ -140,7 +140,7 @@ function social_like_tokens_alter(array &$replacements, array $context, Bubbleab
     // content with new text and link.
     if (isset($context['tokens']['cta_button'])) {
       /** @var \Drupal\votingapi\Entity\Vote $vote */
-      if ($vote = Vote::load($message->field_message_related_object->target_id)) {
+      if ($vote = Vote::load($message->getFieldValue('field_message_related_object', 'target_id'))) {
         $storage = \Drupal::entityTypeManager()->getStorage($vote->getVotedEntityType());
         $voted_entity = $storage->load($vote->getVotedEntityId());
         $url_options = ['absolute' => TRUE];
