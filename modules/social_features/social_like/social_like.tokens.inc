@@ -127,3 +127,47 @@ function social_like_tokens($type, $tokens, array $data, array $options, Bubblea
   }
   return $replacements;
 }
+
+/**
+ * Implements hook_tokens_alter().
+ */
+function social_like_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+  if ($context['type'] == 'message' && !empty($context['data']['message'])) {
+    /** @var Drupal\message\Entity\Message $message */
+    $message = $context['data']['message'];
+
+    // Alter the [message:cta_button] token, and replace it with the rendered
+    // content with new text and link.
+    if (isset($context['tokens']['cta_button'])) {
+      /** @var \Drupal\votingapi\Entity\Vote $vote */
+      if ($vote = Vote::load($message->field_message_related_object->target_id)) {
+        $storage = \Drupal::entityTypeManager()->getStorage($vote->getVotedEntityType());
+        $voted_entity = $storage->load($vote->getVotedEntityId());
+        $url_options = ['absolute' => TRUE];
+        $link = $voted_entity->toUrl('canonical', $url_options)->toString();
+        $content_type = $voted_entity->getEntityTypeId();
+        // We should only use the label of entities who have a label.
+        if ($content_type === 'comment') {
+          /** @var \Drupal\Core\Entity\EntityBase $commented_entity */
+          $commented_entity = $voted_entity->getCommentedEntity();
+          if ($link = $commented_entity->toUrl('canonical', $url_options)->toString()) {
+            $message_template_id = $message->getTemplate()->id();
+            $cta_button = [];
+            switch ($message_template_id) {
+              case 'create_like_node_or_post':
+                $cta_button = [
+                  '#theme' => 'message_cta_button',
+                  '#link' => $link,
+                  '#text' => t('See all likes'),
+                ];
+                break;
+            }
+            if (!empty($cta_button)) {
+              $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -267,44 +267,40 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
         $comment = \Drupal::entityTypeManager()->getStorage($target_type)
           ->load($target_id);
 
-        if ($comment instanceof CommentInterface) {
-          /** @var \Drupal\Core\Entity\Entity $entity */
-          $entity = $comment->getCommentedEntity();
-          if (!empty($entity)) {
-            $commented_entity = $comment->getCommentedEntity();
-            $commented_entity_type = $commented_entity->getEntityTypeId();
-            // A reply link for a post should go to the post view.
-            $link = NULL;
-            if ($commented_entity_type === 'post') {
-              $link = $entity->toUrl('canonical', ['absolute' => TRUE])->toString();
+        /** @var \Drupal\Core\Entity\EntityInterface $commented_entity */
+        if ($comment instanceof CommentInterface && $commented_entity = $comment->getCommentedEntity()) {
+          $commented_entity_type = $commented_entity->getEntityTypeId();
+          // A reply link for a post should go to the post view.
+          $link = NULL;
+          if ($commented_entity_type === 'post') {
+            $link = $commented_entity->toUrl('canonical', ['absolute' => TRUE])->toString();
+          }
+          else {
+            // For comments however it should go to comment reply page.
+            $link = Url::fromRoute('comment.reply', [
+              'entity_type' => $comment->getCommentedEntityTypeId(),
+              'entity' => $comment->getCommentedEntityId(),
+              'field_name' => $comment->getFieldName(),
+              'pid' => $comment->id(),
+            ])->toString();
+          }
+          if ($link) {
+            $message_template_id = $message->getTemplate()->id();
+            $cta_button = [];
+            switch ($message_template_id) {
+              case 'create_comment_author_node_post':
+              case 'create_comment_post_profile':
+              case 'create_comment_following_node':
+              case 'create_comment_reply':
+                $cta_button = [
+                  '#theme' => 'message_cta_button',
+                  '#link' => $link,
+                  '#text' => t('Reply to this comment'),
+                ];
+                break;
             }
-            else {
-              // For comments however it should go to comment reply page.
-              $link = Url::fromRoute('comment.reply', [
-                'entity_type' => $comment->getCommentedEntityTypeId(),
-                'entity' => $comment->getCommentedEntityId(),
-                'field_name' => $comment->getFieldName(),
-                'pid' => $comment->id(),
-              ])->toString();
-            }
-            if ($link) {
-              $message_template_id = $message->getTemplate()->id();
-              $cta_button = [];
-              switch ($message_template_id) {
-                case 'create_comment_author_node_post':
-                case 'create_comment_post_profile':
-                case 'create_comment_following_node':
-                case 'create_comment_reply':
-                  $cta_button = [
-                    '#theme' => 'message_cta_button',
-                    '#link' => $link,
-                    '#text' => t('Reply to this comment'),
-                  ];
-                  break;
-              }
-              if (!empty($cta_button)) {
-                $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);
-              }
+            if (!empty($cta_button)) {
+              $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);
             }
           }
         }
