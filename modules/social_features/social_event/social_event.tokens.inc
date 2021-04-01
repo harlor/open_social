@@ -229,7 +229,7 @@ function _social_event_get_name_from_enrollment($id) {
  * @param string $event_enrollment_id
  *   Event enrollment ID.
  *
- * @return \Drupal\node\Entity\Node|null
+ * @return \Drupal\node\Entity\Node
  *   Event object.
  *
  * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException

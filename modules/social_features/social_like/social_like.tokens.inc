@@ -150,21 +150,22 @@ function social_like_tokens_alter(array &$replacements, array $context, Bubbleab
         if ($content_type === 'comment') {
           /** @var \Drupal\Core\Entity\EntityBase $commented_entity */
           $commented_entity = $voted_entity->getCommentedEntity();
-          if ($link = $commented_entity->toUrl('canonical', $url_options)->toString()) {
-            $message_template_id = $message->getTemplate()->id();
-            $cta_button = [];
-            switch ($message_template_id) {
-              case 'create_like_node_or_post':
-                $cta_button = [
-                  '#theme' => 'message_cta_button',
-                  '#link' => $link,
-                  '#text' => t('See all likes'),
-                ];
-                break;
-            }
-            if (!empty($cta_button)) {
-              $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);
-            }
+          $link = $commented_entity->toUrl('canonical', $url_options)->toString();
+        }
+        if ($link) {
+          $message_template_id = $message->getTemplate()->id();
+          $cta_button = [];
+          switch ($message_template_id) {
+            case 'create_like_node_or_post':
+              $cta_button = [
+                '#theme' => 'message_cta_button',
+                '#link' => $link,
+                '#text' => t('See all likes'),
+              ];
+              break;
+          }
+          if (!empty($cta_button)) {
+            $replacements[$context['tokens']['cta_button']] = \Drupal::service('renderer')->renderPlain($cta_button);
           }
         }
       }

@@ -70,7 +70,7 @@ function social_follow_taxonomy_tokens($type, $tokens, array $data, array $optio
           /** @var \Drupal\message\Entity\Message $message */
           $message = $data['message'];
           // Get the related entity.
-          if (isset($message->field_message_related_object)) {
+          if (!empty($message->get('field_message_related_object'))) {
             $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
             $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
             $entity = \Drupal::entityTypeManager()
@@ -83,7 +83,7 @@ function social_follow_taxonomy_tokens($type, $tokens, array $data, array $optio
                   /** @var \Drupal\node\Entity\Node $entity */
                   if ($entity instanceof NodeInterface) {
                     // Get the name of the content.
-                    $display_name = strtolower($entity->type->entity->label());
+                    $display_name = strtolower($entity->getType()->get('entity')->label());
 
                     // Get the names of terms related to the content.
                     $term_ids = social_follow_taxonomy_terms_list($entity);
@@ -147,7 +147,7 @@ function social_follow_taxonomy_tokens($type, $tokens, array $data, array $optio
   }
 
   if ($type === 'message') {
-    /** @var \Drupal\message\MessageInterface $message */
+    /** @var \Drupal\message\Entity\Message $message */
     $message = $data['message'];
 
     foreach ($tokens as $name => $original) {
@@ -194,7 +194,7 @@ function social_follow_taxonomy_tokens_alter(array &$replacements, array $contex
         $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
         if (isset($target_type) && !empty($target_type) && $target_type === 'group_content') {
-          /** @var \Drupal\node\NodeInterface $group_content */
+          /** @var \Drupal\node\Entity\Node $node */
           $node = \Drupal::entityTypeManager()
             ->getStorage($target_type)
             ->load($target_id);

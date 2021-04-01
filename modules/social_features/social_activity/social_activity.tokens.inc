@@ -38,9 +38,9 @@ function social_activity_tokens($type, $tokens, array $data, array $options, Bub
   $replacements = [];
 
   if ($type === 'message' && !empty($data['message'])) {
-    /** @var \Drupal\message\MessageInterface $message */
+    /** @var \Drupal\message\Entity\Message $message */
     $message = $data['message'];
-    if (isset($message->field_message_related_object)) {
+    if (!empty($message->get('field_message_related_object'))) {
 
       $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
       $target_id = $message->getFieldValue('field_message_related_object', 'target_id');

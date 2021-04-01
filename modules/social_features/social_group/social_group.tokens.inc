@@ -60,7 +60,7 @@ function social_group_tokens($type, $tokens, array $data, array $options, Bubble
         case 'created_entity_link_html':
 
           // Get the related entity.
-          if (isset($message->field_message_related_object)) {
+          if (!empty($message->get('field_message_related_object'))) {
             $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
             $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
             $entity = \Drupal::entityTypeManager()

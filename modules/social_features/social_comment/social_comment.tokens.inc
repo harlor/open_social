@@ -103,7 +103,7 @@ function social_comment_tokens($type, $tokens, array $data, array $options, Bubb
         case 'comment_text':
         case 'comment_reply_link_html':
 
-          if (isset($message->field_message_related_object)) {
+          if (!empty($message->get('field_message_related_object'))) {
             $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
             $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
@@ -189,7 +189,7 @@ function social_comment_tokens($type, $tokens, array $data, array $options, Bubb
         case 'commented_entity_link':
         case 'commented_entity_link_html':
 
-          if (isset($message->field_message_related_object)) {
+          if (!empty($message->get('field_message_related_object'))) {
             $target_type = $message->getFieldValue('field_message_related_object', 'target_type');
             $target_id = $message->getFieldValue('field_message_related_object', 'target_id');
 
@@ -267,8 +267,8 @@ function social_comment_tokens_alter(array &$replacements, array $context, Bubbl
         $comment = \Drupal::entityTypeManager()->getStorage($target_type)
           ->load($target_id);
 
-        /** @var \Drupal\Core\Entity\EntityInterface $commented_entity */
         if ($comment instanceof CommentInterface && $commented_entity = $comment->getCommentedEntity()) {
+          /** @var \Drupal\Core\Entity\EntityInterface $commented_entity */
           $commented_entity_type = $commented_entity->getEntityTypeId();
           // A reply link for a post should go to the post view.
           $link = NULL;

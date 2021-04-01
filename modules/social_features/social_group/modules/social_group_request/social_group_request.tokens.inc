@@ -38,7 +38,7 @@ function social_group_request_tokens($type, $tokens, array $data, array $options
   $replacements = [];
 
   if ($type === 'social_group_request' && !empty($data['message'])) {
-    /** @var \Drupal\message\MessageInterface $message */
+    /** @var Drupal\message\Entity\Message $message */
     $message = $data['message'];
 
     foreach ($tokens as $name => $original) {
